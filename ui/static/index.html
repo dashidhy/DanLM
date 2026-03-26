@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuanDan - DanZero AI</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Start screen -->
+    <div id="start-screen" class="screen active">
+        <button id="btn-lang-start" class="status-btn lang-btn-float" onclick="toggleLang()">中文</button>
+        <div class="start-content">
+            <h1 id="start-title">GuanDan AI</h1>
+            <p id="start-subtitle" class="subtitle">DanZero v3 - AI Poker Platform</p>
+            <div class="agent-selector">
+                <label id="label-agent" for="agent-select">AI Agent</label>
+                <select id="agent-select"></select>
+            </div>
+            <div class="start-buttons">
+                <button id="btn-single-round" onclick="startGame('single_round')" class="btn btn-primary btn-large">
+                    Random Single Round
+                </button>
+                <button id="btn-full-game" onclick="startGame('full_game')" class="btn btn-secondary btn-large">
+                    Full Game (2 to A)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game screen -->
+    <div id="game-screen" class="screen">
+        <!-- Status bar -->
+        <div id="status-bar">
+            <span id="status-level"></span>
+            <span id="status-round"></span>
+            <span id="status-teams"></span>
+            <span id="status-tribute"></span>
+            <span id="status-turn"></span>
+            <button id="btn-reset" class="status-btn" onclick="resetGame()">Reset</button>
+            <button id="btn-menu" class="status-btn" onclick="backToMenu()">Menu</button>
+            <button id="btn-lang" class="status-btn" onclick="toggleLang()">中文</button>
+        </div>
+
+        <!-- Game table -->
+        <div id="game-table">
+            <!-- Top player (teammate) -->
+            <div id="player-top" class="player-area player-top">
+                <div class="player-label">Partner</div>
+                <div class="player-top-row">
+                    <div class="player-cards-back"></div>
+                    <div class="player-tribute-cards"></div>
+                </div>
+                <div class="player-card-count"></div>
+                <div class="player-status"></div>
+            </div>
+
+            <!-- Left player (previous) -->
+            <div id="player-left" class="player-area player-left">
+                <div class="player-label">Prev</div>
+                <div class="player-cards-back"></div>
+                <div class="player-card-count"></div>
+                <div class="player-tribute-cards"></div>
+                <div class="player-status"></div>
+            </div>
+
+            <!-- Right player (next) -->
+            <div id="player-right" class="player-area player-right">
+                <div class="player-label">Next</div>
+                <div class="player-cards-back"></div>
+                <div class="player-card-count"></div>
+                <div class="player-tribute-cards"></div>
+                <div class="player-status"></div>
+            </div>
+
+            <!-- Center area (trick display) -->
+            <div id="center-area">
+                <div id="trick-display">
+                    <div id="trick-top" class="trick-slot"></div>
+                    <div id="trick-left" class="trick-slot"></div>
+                    <div id="trick-right" class="trick-slot"></div>
+                    <div id="trick-bottom" class="trick-slot"></div>
+                </div>
+                <div id="center-message"></div>
+            </div>
+
+            <!-- Bottom player (human) -->
+            <div id="player-bottom" class="player-area player-bottom">
+                <div id="hint-area" class="hidden"></div>
+                <div id="my-tribute-cards" class="player-tribute-cards"></div>
+                <div id="hand-area"></div>
+                <div id="action-bar">
+                    <button id="btn-play" class="btn btn-primary" onclick="playSelected()" disabled>
+                        Play
+                    </button>
+                    <button id="btn-clear" class="btn btn-clear" onclick="clearSelection()">
+                        Clear
+                    </button>
+                    <button id="btn-pass" class="btn btn-secondary" onclick="playPass()" disabled>
+                        Pass
+                    </button>
+                    <button id="btn-hint" class="btn btn-hint" onclick="toggleHint()">
+                        Hint: OFF
+                    </button>
+                    <button id="btn-auto" class="btn btn-auto" onclick="toggleAutoPlay()">
+                        AI Auto: OFF
+                    </button>
+                    <button id="btn-sort" class="btn btn-secondary" onclick="toggleSortOrder()">
+                        Sort: ←
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Round info overlay (pre-game / post-tribute) -->
+        <div id="info-overlay" class="hidden">
+            <div class="result-content">
+                <h2 id="info-title"></h2>
+                <div id="info-details"></div>
+                <div id="info-buttons">
+                    <button id="btn-info-continue" class="btn btn-primary btn-large">
+                        Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disambiguation overlay (wild card ambiguity) -->
+        <div id="disambig-overlay" class="hidden">
+            <div class="result-content disambig-content">
+                <h2 id="disambig-title"></h2>
+                <div id="disambig-options"></div>
+                <div style="margin-top: 12px;">
+                    <button id="btn-disambig-cancel" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Round result overlay -->
+        <div id="result-overlay" class="hidden">
+            <div class="result-content">
+                <h2 id="result-title"></h2>
+                <div id="result-details"></div>
+                <div id="result-buttons">
+                    <button id="btn-new-round" class="btn btn-primary btn-large" onclick="newRound()">
+                        New Round
+                    </button>
+                    <button id="btn-back-menu" class="btn btn-secondary" onclick="backToMenu()">
+                        Menu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+    <script>
+        // Apply language on load
+        applyLang();
+    </script>
+</body>
+</html>
