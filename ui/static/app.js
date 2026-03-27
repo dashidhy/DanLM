@@ -21,7 +21,7 @@ const I18N = {
     en: {
         // Start screen
         title: 'GuanDan AI',
-        subtitle: 'DanZero v3 - AI Poker Platform',
+        subtitle: '',
         singleRound: 'Random Single Round',
         fullGame: 'Full Game (2 to A)',
         // Player labels
@@ -88,7 +88,7 @@ const I18N = {
     },
     zh: {
         title: '掼蛋 AI',
-        subtitle: 'DanZero v3 - AI 掼蛋平台',
+        subtitle: '',
         singleRound: '随机单局',
         fullGame: '完整对局 (2 到 A)',
         you: '自己', next: '下家', partner: '队友', prev: '上家',
@@ -164,7 +164,12 @@ function toggleLang() {
 function applyLang() {
     // Update static HTML elements
     document.getElementById('start-title').textContent = t('title');
-    document.getElementById('start-subtitle').textContent = t('subtitle');
+    const subtitleEl = document.getElementById('start-subtitle');
+    if (subtitleEl) {
+        const sub = t('subtitle');
+        subtitleEl.textContent = sub;
+        subtitleEl.style.display = sub ? '' : 'none';
+    }
     document.getElementById('btn-single-round').textContent = t('singleRound');
     document.getElementById('btn-full-game').textContent = t('fullGame');
     document.getElementById('btn-reset').textContent = t('reset');
@@ -338,7 +343,7 @@ async function loadAgents() {
         const opt = document.createElement('option');
         opt.value = a.key;
         opt.textContent = a.name;
-        if (a.key === 'danzero_v1t') opt.selected = true;
+        if (a.key === 'danlm_v1') opt.selected = true;
         select.appendChild(opt);
     }
 }
