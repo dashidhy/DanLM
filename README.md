@@ -54,42 +54,66 @@ Existing card game AI systems (DouZero, DanZero, PerfectDou, Suphx, etc.) usuall
 | Domain knowledge | Yes | No |
 | Training | DMC self-play | DMC self-play + NTP |
 
-## Results
+## Evaluation
 
-### Head-to-Head: DanLM vs DanZero V1T (500 games, seed=42)
+### Models
 
-> **DanZero V1T** is our enhanced reproduction of DanZero with bug fixes, a stronger state representation, and model-driven tribute selection. It already exceeds the original DanZero paper's results, serving as a strong hand-crafted baseline.
+| Model | Main Architecture | State Representation |
+|-------|-------------|----------|
+| DanZero | MLP | 567-dim hand-crafted |
+| DanZero V1T | MLP | 964-dim hand-crafted |
+| DanLM V1 | causal Transformer | raw info tokenization (~90 vocab)|
 
-| Metric | Result |
-|--------|--------|
-| Single-round win rate | **54.2%** |
-| Whole-game win rate | **66.4%** (332/500) |
+> **DanZero V1T** is our enhanced reproduction of DanZero with bug fixes, stronger state representation, and fully model-driven action selection (original DanZero uses heuristics for tribute). It exceeds the original DanZero's performance under the same training settings, serving as a stronger hand-crafted baseline.
 
-### Model Progression
+### Metrics
 
-```
-DanZero V0 (567-dim hand-crafted) < DanZero V1T (964-dim hand-crafted) < DanLM V1 (zero hand-crafted)
-```
+- **Single-Round Win Rate**: One round with a random level, random tribute/back, and random deal. The team whose player finishes first wins. This is a stricter metric with less variance amplification.
+- **Whole-Game Win Rate**: A complete game consisting of multiple rounds with level progression from 2 to A. This is the metric used in the original DanZero paper (Table I). Single-round advantages are amplified over multiple rounds (e.g., 54% single-round → ~66% whole-game).
 
-DanLM surpasses both hand-crafted models while using **no domain knowledge at all**.
+### Baseline Bots
 
-For detailed evaluation protocol, baseline bot analysis, and full results, see [docs/results.md](docs/results.md).
+We include **16 competition bots** from the [1st National GuanDan AI Algorithm Competition (首届中国人工智能掼蛋算法大赛)](https://gameai.njupt.edu.cn/gameaicompetition/guandan_machine_code/index.html) as standardized evaluation baselines, consistent with the DanZero paper's evaluation protocol.
 
-## Quick Start
+**Key finding: competition rankings do NOT reflect actual bot strength.** Many bots have critical bugs in their source code that caused crashes during the competition. For example, njupt-guandan-ai only won a consolation prize due to a None-check bug causing ~49% of games to crash — but it is actually the strongest bot after the fix. We fixed all bots one-by-one and evaluate against their bug-free versions.
 
-### Requirements
+See `baselines/` for the full bots collection.
+
+### Results
+
+Evaluation results of DanLM against DanZero, DanZero V1T, and the 5 strongest baseline bots: njupt-guandan-ai, chick-squad, guanglan-iot, egg-expert, and egg-pancake.
+
+Random single-round win rate (1000 rounds, seed=42):
+
+|        | DanZero | DanZero V1T | njupt-guandan-ai | chick-squad | guanglan-iot | egg-expert | egg-pancake |
+|--------|--------|--------|--------|--------|--------|--------|--------|
+| DanZero | - | - | 71.4% | 74.6% | 77.3% | 78.8% | 79.1% |
+| DanZero V1T | 62.1% | - | 77.8% | 80.8% | **81.8%** | **83.2%** | **85.9%** |
+| **DanLM** | **65.1%** | **59.6%** | **81.9%** | **82.1%** | 80.9% | 82.3% | **85.9%** |
+
+Whole-game win rate (1000 games, seed=42):
+
+|        | DanZero | DanZero V1T | njupt-guandan-ai | chick-squad | guanglan-iot | egg-expert | egg-pancake |
+|--------|--------|--------|--------|--------|--------|--------|--------|
+| DanZero | - | - | 95.5% | 98.9% | 98.6% | 99.1% | 99.0% |
+| DanZero V1T | 87.5% | - | 99.1% | 99.9% | 100.0% | 100.0% | 99.8% |
+| **DanLM** | | | | | | | |
+
+### Quick Start to Reproduce the Results
+
+#### Requirements
 
 - Python 3.12
 - macOS ARM64 (Apple Silicon)
 
-### Install
+#### Install
 
 ```bash
 pip install torch numpy onnxruntime
 pip install fastapi uvicorn  # for UI
 ```
 
-### Evaluate
+#### Evaluate
 
 ```bash
 # DanLM vs random
@@ -116,7 +140,11 @@ PYTHONPATH=. python scripts/evaluate_game.py \
     --games 100
 ```
 
-### Play (Web UI)
+## Play Against the AI (Web UI)
+
+![Game UI](docs/imgs/ui_screenshot.png)
+
+Play GuanDan against the AI in your browser with built-in AI Hint support showing Q-value estimates for each legal play.
 
 ```bash
 PYTHONPATH=. python ui/server.py
@@ -127,24 +155,6 @@ Choose from 3 AI agents:
 - **DanZero V0** — MLP baseline
 - **DanZero V1T** — Hand-crafted feature SOTA
 - **DanLM V1** — Feature-free TinyLM agent (ours)
-
-## Models
-
-| Model | Architecture | Features | Parameters |
-|-------|-------------|----------|------------|
-| DanZero V0 | 5-layer MLP | 567-dim hand-crafted | ~2.4M |
-| DanZero V1T | 5-layer MLP | 964-dim hand-crafted | ~3.0M |
-| DanLM V1 | TinyLM (3 blocks) + MLP | Raw tokens (91 vocab) | ~5.2M |
-
-## Baseline Bots
-
-This repo includes **16 bug-fixed competition bots** from the [1st National GuanDan AI Algorithm Competition (首届中国人工智能掼蛋算法大赛)](https://gameai.njupt.edu.cn/gameaicompetition/guandan_machine_code/index.html), serving as standardized evaluation baselines. Key findings from our tournament analysis:
-
-- The competition rankings do not reflect actual bot strength
-- The strongest bot (fin-njupt-guandan-ai) only won a consolation prize due to a bug causing ~49% of games to crash
-- After bug fixes, the true top 3 are: njupt-guandan-ai > egg-pancake > chick-squad
-
-See `baselines/` for the full collection.
 
 ## What is GuanDan?
 
