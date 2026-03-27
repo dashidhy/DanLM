@@ -217,6 +217,33 @@ class UIAgent:
         top_idx = np.argsort(q)[::-1][:k]
         return [(int(i), float(q[i])) for i in top_idx]
 
+    # -- Tribute hint support --
+
+    @property
+    def supports_tribute_hint(self) -> bool:
+        """Whether the agent supports model-driven tribute (Q-values)."""
+        return AGENT_REGISTRY[self.agent_key]["rep"] != "v0"
+
+    def get_tribute_give_q_values(
+        self, seat: int, hand: np.ndarray, legal_cards: list[int],
+        is_double: bool, receiver: int | None,
+    ) -> np.ndarray | None:
+        if not self.supports_tribute_hint:
+            return None
+        return self._agents[seat].get_tribute_give_q_values(
+            hand, legal_cards, is_double, receiver,
+        )
+
+    def get_tribute_back_q_values(
+        self, seat: int, hand: np.ndarray, legal_cards: list[int],
+        back_to: int, give_records: list[TributeRecord],
+    ) -> np.ndarray | None:
+        if not self.supports_tribute_hint:
+            return None
+        return self._agents[seat].get_tribute_back_q_values(
+            hand, legal_cards, back_to, give_records,
+        )
+
     # -- Registry --
 
     @staticmethod

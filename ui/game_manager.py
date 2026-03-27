@@ -547,6 +547,68 @@ class GameSession:
         self._advance_tribute()
         return self.to_state_json()
 
+    def auto_tribute(self) -> dict:
+        """AI auto-selects tribute card for human seat. Returns updated state."""
+        trib = self._trib
+        if trib is None or self.phase not in ("tribute_give", "tribute_back"):
+            return self.to_state_json()
+        actor = trib["current_actor"]
+        if actor != self.human_seat:
+            return self.to_state_json()
+        action = trib["current_action"]
+        hands = trib["hands"]
+        target = trib["current_target"]
+        legal = trib["legal_cards"]
+        if action == "give":
+            card = self.agent.select_tribute_give(
+                actor, hands[actor], legal, trib["is_double"], target,
+            )
+        else:
+            give_recs = [
+                TributeRecord(r["giver"], r["receiver"], r["card"])
+                for r in trib["records"] if r.get("action") == "give"
+            ]
+            card = self.agent.select_tribute_back(
+                actor, hands[actor], legal, target, give_recs,
+            )
+        return self.tribute_action(card)
+
+    def get_tribute_hints(self, k: int = 3) -> list[dict]:
+        """Get top-k AI tribute card recommendations with real Q-values."""
+        trib = self._trib
+        if trib is None or self.phase not in ("tribute_give", "tribute_back"):
+            return []
+        actor = trib["current_actor"]
+        if actor != self.human_seat:
+            return []
+        action = trib["current_action"]
+        hands = trib["hands"]
+        level = trib["level"]
+        target = trib["current_target"]
+        legal = trib["legal_cards"]
+        if action == "give":
+            q_values = self.agent.get_tribute_give_q_values(
+                actor, hands[actor], legal, trib["is_double"], target,
+            )
+        else:
+            give_recs = [
+                TributeRecord(r["giver"], r["receiver"], r["card"])
+                for r in trib["records"] if r.get("action") == "give"
+            ]
+            q_values = self.agent.get_tribute_back_q_values(
+                actor, hands[actor], legal, target, give_recs,
+            )
+        if q_values is None:
+            return []
+        import numpy as np
+        top_k = min(k, len(legal))
+        top_idx = np.argsort(q_values)[::-1][:top_k]
+        return [
+            {"card_int": legal[i], "card_info": _card_info(legal[i], level),
+             "q_value": round(float(q_values[i]), 4)}
+            for i in top_idx
+        ]
+
     def continue_tribute(self) -> dict:
         """Resume tribute after user reviewed give results. Proceeds to back phase."""
         if self.phase != "tribute_give_done" or self._trib is None:
@@ -946,4 +1008,6 @@ class GameSession:
             "tribute_action": trib.get("current_action"),
             "tribute_target": trib.get("current_target"),
             "tribute_legal_cards": legal_tribute_cards,
+            "tribute_hints": self.get_tribute_hints() if self.hint_enabled else [],
+            "supports_tribute_hint": self.agent.supports_tribute_hint,
         }

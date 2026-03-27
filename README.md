@@ -96,8 +96,8 @@ Whole-game win rate (1000 games, seed=42):
 |        | DanZero | DanZero V1T | njupt-guandan-ai | chick-squad | guanglan-iot | egg-expert | egg-pancake |
 |--------|--------|--------|--------|--------|--------|--------|--------|
 | DanZero | - | - | 95.5% | 98.9% | 98.6% | 99.1% | 99.0% |
-| DanZero V1T | 87.5% | - | 99.1% | 99.9% | 100.0% | 100.0% | 99.8% |
-| **DanLM** | | | | | | | |
+| DanZero V1T | 87.5% | - | 99.1% | 99.9% | **100.0%** | **100.0%** | 99.8% |
+| **DanLM** | **97.5%** | **74.9%** | **100.0%** | **100.0%** | 99.8% | 99.9% | **99.9%** |
 
 ### Quick Start to Reproduce the Results
 
@@ -140,7 +140,7 @@ PYTHONPATH=. python scripts/evaluate_game.py \
     --games 100
 ```
 
-## Play Against the AI (Web UI)
+## Web UI - Enjoy playing with the AI yourself!
 
 ![Game UI](docs/imgs/ui_screenshot.png)
 
@@ -155,10 +155,6 @@ Choose from 3 AI agents:
 - **DanZero V0** — MLP baseline
 - **DanZero V1T** — Hand-crafted feature SOTA
 - **DanLM V1** — Feature-free TinyLM agent (ours)
-
-## What is GuanDan?
-
-GuanDan (掼蛋) is a 4-player partnership trick-taking card game popular in China. It uses two standard decks (108 cards), features wild cards, level progression, and a tribute system. The game has ~10^36 information sets, making it significantly more complex than most card games studied in AI research.
 
 ## License
 

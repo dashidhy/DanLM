@@ -164,12 +164,6 @@ function toggleLang() {
 function applyLang() {
     // Update static HTML elements
     document.getElementById('start-title').textContent = t('title');
-    const subtitleEl = document.getElementById('start-subtitle');
-    if (subtitleEl) {
-        const sub = t('subtitle');
-        subtitleEl.textContent = sub;
-        subtitleEl.style.display = sub ? '' : 'none';
-    }
     document.getElementById('btn-single-round').textContent = t('singleRound');
     document.getElementById('btn-full-game').textContent = t('fullGame');
     document.getElementById('btn-reset').textContent = t('reset');
@@ -360,21 +354,34 @@ setInterval(() => {
 // === Game lifecycle ===
 
 async function startGame(mode) {
-    const agent = document.getElementById('agent-select').value;
-    const state = await api('/api/new-game', 'POST', { mode, agent });
-    if (!state) return;
-    gameId = state.game_id;
-    gameState = state;
-    selectedCards.clear();
-    tributeConfirmed = false;
-    hintEnabled = false;
-    autoPlayEnabled = false;
+    // Disable buttons to prevent double-click during AI tribute loading
+    const btnSingle = document.getElementById('btn-single-round');
+    const btnFull = document.getElementById('btn-full-game');
+    btnSingle.disabled = true;
+    btnFull.disabled = true;
+    btnSingle.textContent = 'Loading...';
 
-    document.getElementById('start-screen').classList.remove('active');
-    document.getElementById('game-screen').classList.add('active');
+    try {
+        const agent = document.getElementById('agent-select').value;
+        const state = await api('/api/new-game', 'POST', { mode, agent });
+        if (!state) return;
+        gameId = state.game_id;
+        gameState = state;
+        selectedCards.clear();
+        tributeConfirmed = false;
+        hintEnabled = false;
+        autoPlayEnabled = false;
 
-    render();
-    showRoundStartOverlay();
+        document.getElementById('start-screen').classList.remove('active');
+        document.getElementById('game-screen').classList.add('active');
+
+        render();
+        showRoundStartOverlay();
+    } finally {
+        btnSingle.disabled = false;
+        btnFull.disabled = false;
+        btnSingle.textContent = t('singleRound');
+    }
 }
 
 function backToMenu() {
@@ -1179,6 +1186,41 @@ function renderTrick() {
 
 function renderHints() {
     const area = document.getElementById('hint-area');
+
+    // Tribute phase hints
+    if (hintEnabled && (gameState.phase === 'tribute_give' || gameState.phase === 'tribute_back')
+        && gameState.is_human_turn) {
+        const tributeHints = gameState.tribute_hints || [];
+        if (tributeHints.length === 0) {
+            area.classList.add('hidden');
+            return;
+        }
+        area.classList.remove('hidden');
+        area.innerHTML = '';
+        for (const hint of tributeHints) {
+            const item = document.createElement('div');
+            item.className = 'hint-item';
+            item.addEventListener('click', () => {
+                const idx = localHand.findIndex(c => c.card_int === hint.card_int);
+                if (idx >= 0) {
+                    selectedTributeIdx = idx;
+                    renderTributeHand();
+                    renderTributeActionBar();
+                }
+            });
+            const cardsDiv = document.createElement('div');
+            cardsDiv.className = 'hint-cards';
+            cardsDiv.appendChild(createCardElement(hint.card_info, true));
+            item.appendChild(cardsDiv);
+            const qEl = document.createElement('div');
+            qEl.className = 'hint-q-value';
+            qEl.textContent = `Q: ${hint.q_value.toFixed(3)}`;
+            item.appendChild(qEl);
+            area.appendChild(item);
+        }
+        return;
+    }
+
     const hints = gameState.hints || [];
 
     if (!hintEnabled || hints.length === 0 || !gameState.is_human_turn) {
@@ -1227,10 +1269,14 @@ function renderHints() {
 }
 
 function renderActionBar() {
-    // Ensure buttons are visible (may have been hidden during tribute)
-    document.getElementById('btn-play').classList.remove('hidden');
+    // Ensure buttons are visible and restored (may have been modified during tribute)
+    const playBtn = document.getElementById('btn-play');
+    playBtn.classList.remove('hidden');
+    playBtn.textContent = t('play');
+    playBtn.onclick = () => playSelected();
     document.getElementById('btn-pass').classList.remove('hidden');
     document.getElementById('btn-hint').classList.remove('hidden');
+    document.getElementById('btn-hint').disabled = false;
     document.getElementById('btn-auto').classList.remove('hidden');
     document.getElementById('btn-sort').classList.remove('hidden');
 
@@ -1408,12 +1454,32 @@ function renderTributeActionBar() {
     const action = gameState.tribute_action;
     const target = gameState.tribute_target;
 
-    // Hide most buttons during tribute, show Sort and Confirm
+    // Hide pass, show sort
     document.getElementById('btn-pass').classList.add('hidden');
-    document.getElementById('btn-hint').classList.add('hidden');
-    document.getElementById('btn-auto').classList.add('hidden');
     document.getElementById('btn-sort').classList.remove('hidden');
     document.getElementById('btn-sort').textContent = sortAscending ? t('sortAsc') : t('sortDesc');
+
+    // AI Hint — disable for V0 (no Q-values)
+    const hintBtn = document.getElementById('btn-hint');
+    hintBtn.classList.remove('hidden');
+    if (gameState.supports_tribute_hint) {
+        hintBtn.disabled = false;
+        hintBtn.textContent = hintEnabled ? t('hintOn') : t('hintOff');
+    } else {
+        hintBtn.disabled = true;
+        hintBtn.textContent = t('hintOff');
+    }
+
+    // AI Auto — always enabled
+    const autoBtn = document.getElementById('btn-auto');
+    autoBtn.classList.remove('hidden');
+    autoBtn.textContent = autoPlayEnabled ? t('autoOn') : t('autoOff');
+
+    // If auto-play is on, trigger auto tribute
+    if (autoPlayEnabled) {
+        tributeAutoPlay();
+        return;
+    }
 
     // Repurpose the Play button as Confirm
     const playBtn = document.getElementById('btn-play');
@@ -1433,6 +1499,31 @@ function renderTributeActionBar() {
             : t('chooseHighest');
     } else if (action === 'back') {
         msgEl.innerHTML = `${t('chooseReturnTo')} ${playerLabel(target)}`;
+    }
+}
+
+async function tributeAutoPlay() {
+    const state = await api('/api/tribute-auto', 'POST', { game_id: gameId });
+    if (!state) return;
+    gameState = state;
+
+    if (state.phase !== 'tribute_give' && state.phase !== 'tribute_back') {
+        const playBtn = document.getElementById('btn-play');
+        playBtn.textContent = t('play');
+        playBtn.onclick = () => playSelected();
+        playBtn.classList.remove('hidden');
+        document.getElementById('btn-pass').classList.remove('hidden');
+        document.getElementById('btn-hint').classList.remove('hidden');
+        document.getElementById('btn-auto').classList.remove('hidden');
+        document.getElementById('btn-sort').classList.remove('hidden');
+    }
+
+    render();
+
+    if (state.phase === 'tribute_give_done' && !tributeConfirmed) {
+        showTributeGiveOverlay();
+    } else if (state.phase === 'playing' && !tributeConfirmed) {
+        showPostTributeOverlay();
     }
 }
 

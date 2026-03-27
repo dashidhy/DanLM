@@ -216,6 +216,16 @@ async def tribute_action(req: TributeActionRequest):
     return state
 
 
+@app.post("/api/tribute-auto")
+async def tribute_auto(req: GameIdRequest):
+    """AI auto-selects tribute card for human seat."""
+    session = get_session(req.game_id)
+    if session.phase not in ("tribute_give", "tribute_back"):
+        raise HTTPException(status_code=400, detail="Not in tribute phase")
+    state = session.auto_tribute()
+    return state
+
+
 @app.post("/api/confirm-tribute")
 async def confirm_tribute(req: GameIdRequest):
     """User confirms they've seen the tribute info. Now start AI turns."""
