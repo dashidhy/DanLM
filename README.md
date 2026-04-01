@@ -19,7 +19,7 @@ graph LR
     style q1 fill:#ffebee,stroke:#E53935
 ```
 
-### DanLM (This Work) — zero domain knowledge
+### DanLM (This Work) — zero domain knowledge, learn everything from raw observations
 
 ```mermaid
 graph LR
@@ -75,7 +75,7 @@ Existing card game AI systems (DouZero, DanZero, PerfectDou, Suphx, etc.) usuall
 
 We include **16 competition bots** from the [1st National GuanDan AI Algorithm Competition (首届中国人工智能掼蛋算法大赛)](https://gameai.njupt.edu.cn/gameaicompetition/guandan_machine_code/index.html) as standardized evaluation baselines, consistent with the DanZero paper's evaluation protocol.
 
-**Key finding: competition rankings do NOT reflect actual bot strength.** Many bots have critical bugs in their source code that caused crashes during the competition. For example, njupt-guandan-ai only won a consolation prize due to a None-check bug causing ~49% of games to crash — but it is actually the strongest bot after the fix. We fixed all bots one-by-one and evaluate against their bug-free versions.
+**Key finding: competition rankings do NOT reflect actual bot strength.** Many bots have critical bugs in their source code that caused crashes during the competition. For example, njupt-guandan-ai only won a consolation prize due to a None-check bug causing ~49% of games to crash — but it is actually the strongest bot after the fix. **We fixed all bots one by one and evaluated against their bug-free versions.**
 
 See `baselines/` for the full bots collection.
 
