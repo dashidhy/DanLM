@@ -4,6 +4,12 @@ A game AI that learns entirely from raw game history via self-play reinforcement
 
 **Disclaimer: This project was developed through ~100% vibe coding (powered by Claude Opus 4.6). While extensively tested, the code and documentation may contain critical bugs, hallucinations, or inaccuracies.** We are actively working on fixing these issues. Use at your own risk and verify critical results independently. If you encounter any problems, feel free to [open an issue](../../issues).
 
+### Updates
+
+(2026-04-03) 🔥 DanLM has reached **#1** on the [Botzone GuanDan leaderboard](https://en.botzone.org.cn/game/ranklist/65490c16ec1ab1389702dced), surpassing all the other 30 bots.
+
+![Botzone GuanDan Ranking](docs/imgs/botzone_guandan_ranking.png)
+
 ---
 
 ## Architecture
