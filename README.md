@@ -1,11 +1,11 @@
 # DanLM: Tokenization Is All You Need to Master Complex Card Games
 
-A game AI that learns entirely from raw game history via self-play reinforcement learning, with **truly zero domain knowledge — no policy priors, no hand-crafted features**, what you see is what you get, surpassing hand-crafted SOTA in GuanDan (掼蛋), a complex 4-player trick-taking card game hugely popular across China.
+A game AI that learns entirely from raw game history via self-play reinforcement learning, with **truly zero domain knowledge — no policy priors, no hand-crafted features**, what you see is what you get, surpassing hand-crafted SOTA in GuanDan (掼蛋) and DouDiZhu（斗地主）, two complex multi-player trick-taking card games hugely popular across China.
 
 **Disclaimer: This project was developed through ~100% vibe coding (powered by Claude Opus 4.6). While extensively tested, the code and documentation may contain critical bugs, hallucinations, or inaccuracies.** We are actively working on fixing these issues. Use at your own risk and verify critical results independently. If you encounter any problems, feel free to [open an issue](../../issues).
 
 ### Updates
-
+(2026-05-01) 🔥 We proposed DouLM, the DouDiZhu version of DanLM, has reached **#1** on the [Botzone FightTheLandlord leaderboard](https://en.botzone.org.cn/game/ranklist/545840890003e2b77caf768f?page=0#69e11d749e279a05639b3002), surpassing all the other 491 bots.
 (2026-04-03) 🔥 DanLM has reached **#1** on the [Botzone GuanDan leaderboard](https://en.botzone.org.cn/game/ranklist/65490c16ec1ab1389702dced), surpassing all the other 30 bots.
 
 ![Botzone GuanDan Ranking](docs/imgs/botzone_guandan_ranking.png)
