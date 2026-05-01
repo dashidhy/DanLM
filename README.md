@@ -6,6 +6,7 @@ A game AI that learns entirely from raw game history via self-play reinforcement
 
 ### Updates
 (2026-05-01) 🔥 We proposed DouLM, the DouDiZhu version of DanLM, has reached **#1** on the [Botzone FightTheLandlord leaderboard](https://en.botzone.org.cn/game/ranklist/545840890003e2b77caf768f?page=0#69e11d749e279a05639b3002), surpassing all the other 491 bots.
+
 (2026-04-03) 🔥 DanLM has reached **#1** on the [Botzone GuanDan leaderboard](https://en.botzone.org.cn/game/ranklist/65490c16ec1ab1389702dced), surpassing all the other 30 bots.
 
 ![Botzone GuanDan Ranking](docs/imgs/botzone_guandan_ranking.png)
