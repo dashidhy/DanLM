@@ -2,6 +2,14 @@
 
 A game AI that learns entirely from self-play reinforcement learning and next-token prediction of raw game history, with **truly zero domain knowledge — no policy priors, no hand-crafted features**, what you see is what you get, surpassing hand-crafted SOTA in GuanDan (掼蛋) and DouDiZhu (斗地主), two complex multi-player trick-taking card games hugely popular across China.
 
+<a href="https://www.star-history.com/?repos=dashidhy%2Fdanlm&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=dashidhy/danlm&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=dashidhy/danlm&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=dashidhy/danlm&type=date&legend=top-left" />
+ </picture>
+</a>
+
 **Disclaimer: This project was developed through ~100% vibe coding (powered by Claude Opus 4.6). While extensively tested, the code and documentation may contain critical bugs, hallucinations, or inaccuracies.** We are actively working on fixing these issues. Use at your own risk and verify critical results independently. If you encounter any problems, feel free to [open an issue](../../issues).
 
 ### Updates
