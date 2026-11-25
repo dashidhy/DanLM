@@ -1,6 +1,6 @@
 # DanLM: Next Token Is All You Need to Master Complex Card Games
 
-A game AI that learns entirely from self-play reinforcement learning and next-token prediction of raw game history, with **truly zero domain knowledge — no policy priors, no hand-crafted features**, what you see is what you get, surpassing hand-crafted SOTA in GuanDan (掼蛋) and DouDiZhu (斗地主), two complex multi-player trick-taking card games hugely popular across China.
+An end-to-end game AI that learns entirely from self-play reinforcement learning and next-token prediction of raw game history, with **truly zero domain knowledge — no policy priors, no hand-crafted features**, what you see is what the AI get, surpassing hand-crafted SOTA in GuanDan (掼蛋) and DouDiZhu (斗地主), two complex multi-player trick-taking card games hugely popular across China.
 
 <a href="https://www.star-history.com/?repos=dashidhy%2Fdanlm&type=date&legend=top-left">
  <picture>
